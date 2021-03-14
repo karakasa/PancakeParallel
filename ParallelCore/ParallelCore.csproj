@@ -45,13 +45,13 @@
     <Compile Include="Interface\IExceptionStorage.cs" />
     <Compile Include="Interface\IScheduler.cs" />
     <Compile Include="Interface\ITaskProvider.cs" />
-    <Compile Include="Interface\ITopologyNode.cs" />
+    <Compile Include="Interface\ITopologicalNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scheduler\BasicStructure.cs" />
     <Compile Include="Scheduler\SchedulerFactory.cs" />
     <Compile Include="Scheduler\LoadBalancedScheduler.cs" />
     <Compile Include="Scheduler\SequentialTaskProvider.cs" />
-    <Compile Include="Scheduler\TopologyTaskProvider.cs" />
+    <Compile Include="Scheduler\TopologicalTaskProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

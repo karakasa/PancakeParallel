@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ParallelCore.Interface
 {
-    public interface ITopologyNode
+    public interface ITopologicalNode
     {
-        ICollection<ITopologyNode> Sources { get; }
+        ICollection<ITopologicalNode> Sources { get; }
         void Compute();
     }
 }

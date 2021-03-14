@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ParallelCore.Scheduler
 {
-    public class TopologyTaskProvider : ITaskProvider<int>
+    public class TopologicalTaskProvider : ITaskProvider<int>
     {
-        public TopologyTaskProvider(ICollection<ITopologyNode> nodes)
+        public TopologicalTaskProvider(ICollection<ITopologicalNode> nodes)
         {
             Initialize(nodes);
         }
@@ -52,47 +52,58 @@ namespace ParallelCore.Scheduler
         }
         private struct AbstractNode
         {
-            public ITopologyNode Node;
-            public List<ITopologyNode> Sources;
+            public int OriginalIndex;
+            public ITopologicalNode Node;
+            public List<ITopologicalNode> Sources;
         }
 
         private struct CachedNode
         {
-            public ITopologyNode Node;
+            public ITopologicalNode Node;
             public int[] SourceIds;
+        }
+        private List<AbstractNode> DeepCopy(IEnumerable<AbstractNode> nodes)
+        {
+            return nodes.Select(n => new AbstractNode
+            {
+                OriginalIndex = n.OriginalIndex,
+                Node = n.Node,
+                Sources = new List<ITopologicalNode>(n.Sources)
+            }).ToList();
         }
         private List<AbstractNode> TopologicalSort(List<AbstractNode> nodes)
         {
             var list = new List<AbstractNode>(nodes.Count);
+            var copiedNodes = DeepCopy(nodes);
 
             for (; ; )
             {
                 var found = false;
 
-                for (var i = 0; i < nodes.Count; i++)
+                for (var i = 0; i < copiedNodes.Count; i++)
                 {
-                    var it = nodes[i];
+                    var it = copiedNodes[i];
 
                     if (it.Sources.Count == 0)
                     {
-                        list.Add(it);
+                        list.Add(nodes[it.OriginalIndex]);
 
-                        for (var j = 0; j < nodes.Count; j++)
+                        for (var j = 0; j < copiedNodes.Count; j++)
                         {
                             if (i == j)
                                 continue;
 
-                            nodes[j].Sources.RemoveAll(src => object.ReferenceEquals(src, it.Node));
+                            copiedNodes[j].Sources.RemoveAll(src => object.ReferenceEquals(src, it.Node));
                         }
 
-                        nodes.RemoveAt(i);
+                        copiedNodes.RemoveAt(i);
                         found = true;
 
                         break;
                     }
                 }
 
-                if (nodes.Count == 0)
+                if (copiedNodes.Count == 0)
                     break;
 
                 if (!found)
@@ -107,7 +118,7 @@ namespace ParallelCore.Scheduler
 
         private CachedNode[] ToIndexedNodes(List<AbstractNode> nodes)
         {
-            var dict = new Dictionary<ITopologyNode, int>();
+            var dict = new Dictionary<ITopologicalNode, int>();
 
             for (var i = 0; i < nodes.Count; i++)
                 dict[nodes[i].Node] = i;
@@ -121,10 +132,11 @@ namespace ParallelCore.Scheduler
         private CachedNode[] _indexedNodes;
         private TaskStatus[] _nodeStatus;
         private int _nextTask = 0;
-        private void Initialize(ICollection<ITopologyNode> nodes)
+        private void Initialize(ICollection<ITopologicalNode> nodes)
         {
-            var _nodes = nodes.Select(n => new AbstractNode
+            var _nodes = nodes.Select((n, i) => new AbstractNode
             {
+                OriginalIndex = i,
                 Node = n,
                 Sources = n.Sources.ToList()
             }).ToList();

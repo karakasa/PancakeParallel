@@ -21,6 +21,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,6 +50,7 @@
   <ItemGroup>
     <Compile Include="SequentialTasks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TopologicalTasks.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
