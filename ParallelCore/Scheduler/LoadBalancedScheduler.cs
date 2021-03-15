@@ -169,7 +169,7 @@ namespace ParallelCore.Scheduler
                 {
                     CompleteInternalTask(currentId);
                 }
-            });
+            }, TaskCreationOptions.PreferFairness);
 
             return new InternalTask
             {
